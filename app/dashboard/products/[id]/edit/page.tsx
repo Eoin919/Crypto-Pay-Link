@@ -61,21 +61,35 @@ export default function EditProduct() {
   }, [productId, router])
 
   const fetchProduct = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch(`/api/products/${productId}`)
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('Product not found')
-        } else if (response.status === 401) {
-          throw new Error('You do not have permission to edit this product')
-        }
-        throw new Error('Failed to fetch product')
-      }
+  try {
+    setLoading(true);
 
-      const productData = await response.json()
-      setProduct(productData)
+    const response = await fetch(`/api/products/${productId}`);
+
+    if (!response.ok) {
+      switch (response.status) {
+        case 404:
+          throw new Error('Product not found');
+        case 401:
+          throw new Error('You do not have permission to edit this product');
+        default:
+          throw new Error(`Failed to fetch product. Status: ${response.status}`);
+      }
+    }
+
+    const productData = await response.json();
+    setProduct(productData);
+    
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    // Optional: Show user-friendly error in UI
+    setError(error.message || 'An unexpected error occurred');
+    
+  } finally {
+    setLoading(false);
+  }
+};
+
       
       // Populate form
       setFormData({
