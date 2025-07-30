@@ -53,29 +53,42 @@ export default function Dashboard() {
   }, [router, supabase])
 
   const fetchData = async () => {
-    try {
-      // Fetch products
-      const { data: productsData, error: productsError } = await supabase
-        .from('products')
+  try {
+    // Step 1: Fetch products, ordered by creation date (newest first)
+    const { data: productsData, error: productsError } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (productsError) throw productsError;
+
+    const productIds = productsData?.map(p => p.id) ?? [];
+
+    // Step 2: If there are products, fetch payments for those products
+    let paymentsData: Payment[] = [];
+
+    if (productIds.length > 0) {
+      const { data: payments, error: paymentsError } = await supabase
+        .from('payments')
         .select('*')
-        .order('created_at', { ascending: false })
+        .in('product_id', productIds)
+        .order('created_at', { ascending: false });
 
-      if (productsError) throw productsError
+      if (paymentsError) throw paymentsError;
 
-      // Fetch payments for user's products
-      const productIds = productsData?.map(p => p.id) || []
-      let paymentsData: Payment[] = []
+      paymentsData = payments ?? [];
+    }
 
-      if (productIds.length > 0) {
-        const { data: payments, error: paymentsError } = await supabase
-          .from('payments')
-          .select('*')
-          .in('product_id', productIds)
-          .order('created_at', { ascending: false })
+    // Optionally return both sets of data
+    return { products: productsData, payments: paymentsData };
 
-        if (paymentsError) throw paymentsError
-        paymentsData = payments || []
-      }
+  } catch (err) {
+    console.error("Error fetching data:", err);
+    // Optional: return empty structure or rethrow
+    return { products: [], payments: [] };
+  }
+};
+
 
       setProducts(productsData || [])
       setPayments(paymentsData)
