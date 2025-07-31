@@ -110,31 +110,39 @@ export default function Dashboard() {
     }
   }
 
-  // Filter payments based on search term
-  useEffect(() => {
-    if (!searchTerm) {
-      setFilteredPayments(payments)
-    } else {
-      const filtered = payments.filter(payment =>
-        payment.transaction_hash?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        payment.buyer_email.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      setFilteredPayments(filtered)
-    }
-  }, [searchTerm, payments])
-
-  const copyPaymentLink = (productId: string) => {
-    const link = `${window.location.origin}/pay/${productId}`
-    navigator.clipboard.writeText(link)
+ // Filter payments based on search term
+useEffect(() => {
+  if (!searchTerm) {
+    setFilteredPayments(payments)
+  } else {
+    const lowerSearch = searchTerm.toLowerCase()
+    const filtered = payments.filter(payment =>
+      payment.transaction_hash?.toLowerCase().includes(lowerSearch) ||
+      payment.buyer_email.toLowerCase().includes(lowerSearch)
+    )
+    setFilteredPayments(filtered)
   }
+}, [searchTerm, payments])
 
-  const getBlockExplorerUrl = (hash: string, chain: string) => {
-    if (chain === 'solana') {
+const copyPaymentLink = (productId: string) => {
+  const link = `${window.location.origin}/pay/${productId}`
+  navigator.clipboard.writeText(link).catch(err =>
+    console.error('Failed to copy payment link:', err)
+  )
+}
+
+const getBlockExplorerUrl = (hash: string, chain: string): string => {
+  switch (chain.toLowerCase()) {
+    case 'solana':
       return `https://solscan.io/tx/${hash}`
-    } else {
+    case 'ethereum':
+    case 'eth':
       return `https://etherscan.io/tx/${hash}`
-    }
+    default:
+      return '#'
   }
+}
+
 
   const downloadInvoice = async (paymentId: string) => {
     try {
