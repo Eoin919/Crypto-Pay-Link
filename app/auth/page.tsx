@@ -59,42 +59,43 @@ export default function AuthPage() {
     }
   }
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    setLoading(true)
-    setMessage('')
+const handleSignIn = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setLoading(true)
+  setMessage('')
 
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) throw error
-      router.push('/dashboard')
-    } catch (error: any) {
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+    router.push('/dashboard')
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       setMessage(error.message)
-    } finally {
-      setLoading(false)
+    } else {
+      setMessage('An unexpected error occurred.')
     }
+  } finally {
+    setLoading(false)
   }
+}
 
-  const handleGoogleSignIn = async () => {
-    setLoading(true)
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`
-        }
-      })
-      if (error) throw error
-    } catch (error: any) {
+const handleGoogleSignIn = async () => {
+  setLoading(true)
+
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    })
+    if (error) throw error
+  } catch (error: unknown) {
+    if (error instanceof Error) {
       setMessage(error.message)
-      setLoading(false)
-    }
-  }
+    } else {
+      setMessage('An unexpected error occur
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-gray-100 flex items-center justify-center p-4">
