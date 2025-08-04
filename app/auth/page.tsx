@@ -59,25 +59,30 @@ export default function AuthPage() {
     }
   }
 
-const handleSignIn = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setLoading(true)
-  setMessage('')
+const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  setLoading(true);
+  setMessage('');
 
   try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) throw error
-    router.push('/dashboard')
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      setMessage(error.message)
-    } else {
-      setMessage('An unexpected error occurred.')
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      throw new Error(`Sign-in failed: ${error.message}`);
     }
+
+    router.push('/dashboard');
+  } catch (err: unknown) {
+    const errorMessage =
+      err instanceof Error ? err.message : 'Unexpected error during sign-in.';
+    console.error('SignIn Error:', err);
+    setMessage(errorMessage);
   } finally {
-    setLoading(false)
+    setLoading(false);
   }
-}
+};
+
 
 const handleGoogleSignIn = async () => {
   setLoading(true)
