@@ -52,42 +52,52 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, supabase])
 
-  const fetchData = async () => {
+type FetchedData = {
+  products: Product[];
+  payments: Payment[];
+};
+
+const fetchData = async (): Promise<FetchedData> => {
   try {
-    // Step 1: Fetch products, ordered by creation date (newest first)
-    const { data: productsData, error: productsError } = await supabase
+    // Fetch latest products
+    const { data: products, error: productsError } = await supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (productsError) throw productsError;
-
-    const productIds = productsData?.map(p => p.id) ?? [];
-
-    // Step 2: If there are products, fetch payments for those products
-    let paymentsData: Payment[] = [];
-
-    if (productIds.length > 0) {
-      const { data: payments, error: paymentsError } = await supabase
-        .from('payments')
-        .select('*')
-        .in('product_id', productIds)
-        .order('created_at', { ascending: false });
-
-      if (paymentsError) throw paymentsError;
-
-      paymentsData = payments ?? [];
+    if (productsError) {
+      throw new Error(`Failed to fetch products: ${productsError.message}`);
     }
 
-    // Optionally return both sets of data
-    return { products: productsData, payments: paymentsData };
+    if (!products || products.length === 0) {
+      return { products: [], payments: [] };
+    }
 
-  } catch (err) {
-    console.error("Error fetching data:", err);
-    // Optional: return empty structure or rethrow
+    // Extract product IDs
+    const productIds = products.map(({ id }) => id);
+
+    // Fetch payments associated with the fetched products
+    const { data: payments, error: paymentsError } = await supabase
+      .from('payments')
+      .select('*')
+      .in('product_id', productIds)
+      .order('created_at', { ascending: false });
+
+    if (paymentsError) {
+      throw new Error(`Failed to fetch payments: ${paymentsError.message}`);
+    }
+
+    return {
+      products,
+      payments: payments ?? [],
+    };
+
+  } catch (error) {
+    console.error("Data fetching error:", error);
     return { products: [], payments: [] };
   }
 };
+
 
 
       setProducts(productsData || [])
