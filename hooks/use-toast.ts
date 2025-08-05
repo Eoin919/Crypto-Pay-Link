@@ -73,45 +73,53 @@ const addToRemoveQueue = (toastId: string) => {
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case 'ADD_TOAST':
-      return {
-        ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
-      };
+    case 'ADD_TOAST': {
+      const updatedToasts = [action.toast, ...state.toasts].slice(0, TOAST_LIMIT);
+      return { ...state, toasts: updatedToasts };
+    }
 
-    case 'UPDATE_TOAST':
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
-        ),
-      };
+    case 'UPDATE_TOAST': {
+      const updatedToasts = state.toasts.map(toast =>
+        toast.id === action.toast.id ? { ...toast, ...action.toast } : toast
+      );
+      return { ...state, toasts: updatedToasts };
+    }
 
     case 'DISMISS_TOAST': {
       const { toastId } = action;
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
-      if (toastId) {
-        addToRemoveQueue(toastId);
-      } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
-        });
-      }
+      handleDismissSideEffect(toastId, state.toasts);
 
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
-            ? {
-                ...t,
-                open: false,
-              }
-            : t
-        ),
-      };
+      const updatedToasts = state.toasts.map(toast =>
+        toast.id === toastId || toastId === undefined
+          ? { ...toast, open: false }
+          : toast
+      );
+
+      return { ...state, toasts: updatedToasts };
     }
+
+    default:
+      return state;
+  }
+};
+
+// ─────────────────────────────────────────────────────────
+// Utilities
+// ─────────────────────────────────────────────────────────
+
+/**
+ * Handles enqueueing toasts for removal based on the toastId.
+ * Performs side effects outside reducer logic.
+ */
+function handleDismissSideEffect(toastId: string | undefined, toasts: Toast[]) {
+  if (toastId) {
+    addToRemoveQueue(toastId);
+  } else {
+    toasts.forEach(toast => addToRemoveQueue(toast.id));
+  }
+}
+
     case 'REMOVE_TOAST':
       if (action.toastId === undefined) {
         return {
