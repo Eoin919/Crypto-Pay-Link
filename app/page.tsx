@@ -109,41 +109,41 @@ export default function HomePage() {
 
 
       {/* Hero Section */}
-      <section className="pt-20 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Accept <span className="text-green-600">Crypto Payments</span> Like a Pro
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              The easiest way for creators, freelancers, and educators to accept cryptocurrency payments.
-              No coding required, automatic verification, instant invoicing.
-            </p>
+<section className="py-20 bg-white">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div className="max-w-3xl mx-auto">
+      <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
+        Accept <span className="text-green-600">Crypto Payments</span> Like a Pro
+      </h1>
+      <p className="text-xl text-gray-600 mb-10">
+        Empower your digital business with seamless crypto payment tools — perfect for creators, freelancers, and educators. No code. Just revenue.
+      </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center w-full">
-              <Link href="/auth" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  className="bg-green-600 hover:bg-green-700 text-lg w-full sm:w-auto"
-                >
-                  Start Accepting Payments
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/demo" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="text-lg w-full sm:w-auto"
-                >
-                  View Demo
-                </Button>
-              </Link>
-            </div>
+      <div className="flex flex-col sm:flex-row justify-center gap-4">
+        <Link href="/auth" passHref legacyBehavior>
+          <Button
+            size="lg"
+            className="bg-green-600 hover:bg-green-700 text-white text-lg w-full sm:w-auto"
+          >
+            Start Accepting Payments
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
 
-          </div>
-        </div>
-      </section>
+        <Link href="/demo" passHref legacyBehavior>
+          <Button
+            size="lg"
+            variant="outline"
+            className="text-lg w-full sm:w-auto"
+          >
+            View Demo
+          </Button>
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Supported Tokens */}
       <section className="py-16 bg-white/50">
