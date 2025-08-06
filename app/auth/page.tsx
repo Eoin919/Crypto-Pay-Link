@@ -200,14 +200,20 @@ const handleGoogleSignIn = async () => {
                       />
                     </div>
                   </div>
-                  
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                      Password
+                    </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Lock
+                        className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
+                        aria-hidden="true"
+                      />
                       <Input
                         id="password"
+                        name="password"
                         type="password"
+                        autoComplete="new-password"
                         placeholder="Create a password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -216,6 +222,7 @@ const handleGoogleSignIn = async () => {
                       />
                     </div>
                   </div>
+
                   
                   <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={loading}>
                     {loading ? 'Creating account...' : 'Create Account'}
