@@ -27,7 +27,6 @@ export default function HomePage() {
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          router.push('/dashboard')
         }
       } catch (error) {
         console.error('Auth check error:', error)
@@ -43,6 +42,7 @@ export default function HomePage() {
       description: "All payments are verified directly on-chain. No intermediaries or custody risks."
     },
     {
+          router.push('/dashboard')
       icon: <Zap className="h-6 w-6" />,
       title: "Instant Verification",
       description: "Automatic transaction verification within minutes using blockchain APIs."
