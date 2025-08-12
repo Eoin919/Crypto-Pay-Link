@@ -105,20 +105,29 @@ const fetchData = async (): Promise<FetchedData> => {
       setFilteredPayments(paymentsData)
 
       // Calculate stats
-      const totalRevenue = paymentsData
-        .filter(p => p.status === 'confirmed')
-        .reduce((sum, p) => sum + p.amount_usd, 0)
+     try {
+  let totalRevenue = 0
+  let totalPayments = 0
 
-      const totalPayments = paymentsData.filter(p => p.status === 'confirmed').length
-      const activeProducts = productsData?.filter(p => p.is_active).length || 0
-
-      setStats({ totalRevenue, totalPayments, activeProducts })
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    } finally {
-      setLoading(false)
+  if (Array.isArray(paymentsData)) {
+    for (const p of paymentsData) {
+      if (p.status === 'confirmed') {
+        totalRevenue += p.amount_usd
+        totalPayments++
+      }
     }
   }
+
+  const activeProducts = Array.isArray(productsData)
+    ? productsData.filter(p => p.is_active).length
+    : 0
+
+  setStats({ totalRevenue, totalPayments, activeProducts })
+} catch (error) {
+  console.error('Error fetching data:', error)
+} finally {
+  setLoading(false)
+}
 
  // Filter payments based on search term
 useEffect(() => {
